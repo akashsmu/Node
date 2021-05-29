@@ -8,6 +8,7 @@ const port = process.env.PORT || 9000;
 
 const url =
   "mongodb+srv://admin:wl20pRZOdRsA3VZB@cluster0.ep66e.mongodb.net/whatsappdb?retryWrites=true&w=majority";
+
 mongoose.connect(url, {
   useCreateIndex: true,
   useNewUrlParser: true,
@@ -15,6 +16,11 @@ mongoose.connect(url, {
 });
 
 app.use(express.json());
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Headers", "*");
+  next();
+});
 
 app.get("/", (req, res) => res.status(200).send("Hello World"));
 
@@ -29,8 +35,19 @@ const pusher = new Pusher({
 const db = mongoose.connection;
 db.once("open", () => {
   console.log("DB connected");
-  const msgCollection = db.collection("messagecontent");
+  const msgCollection = db.collection("messagecontents");
   const changeStream = msgCollection.watch();
+  changeStream.on("change", (change) => {
+    if (change.operationType == "insert") {
+      const messageDetails = change.fullDocument;
+      pusher.trigger("messages", "inserted", {
+        name: messageDetails.name,
+        message: messageDetails.message,
+      });
+    } else {
+      console.log("Error Triggering Pusher");
+    }
+  });
 });
 
 app.get("/messages/sync", (req, res) => {
