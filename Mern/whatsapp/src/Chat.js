@@ -9,7 +9,7 @@ import {
 import React, { useState } from "react";
 import "./Chat.css";
 
-function Chat() {
+function Chat({ message }) {
   const [input, setInput] = useState();
 
   const sendMessage = () => {};
@@ -35,11 +35,13 @@ function Chat() {
       </div>
 
       <div className="chat_body">
-        <p className="chat_message chat_reciever">
-          <span className="chat_name">Akash</span>
-          This is the message
-          <span className="chat_timestamp">{new Date().toUTCString()}</span>
-        </p>
+        {message.map((message) => (
+          <p className="chat_message chat_reciever">
+            <span className="chat_name">{message.name}</span>
+            {message.message}
+            <span className="chat_timestamp">{message.timestamp}</span>
+          </p>
+        ))}
       </div>
 
       <div className="chat_footer">
