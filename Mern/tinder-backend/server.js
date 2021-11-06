@@ -10,7 +10,7 @@ const port = process.env.PORT || 8001;
 const connection_url = `mongodb+srv://admin:ISTi9hkkTAhNaiHG@cluster0.7nhzm.mongodb.net/tinderDb?retryWrites=true&w=majority`;
 
 app.use(express.json());
-app.use(cors);
+app.use(cors());
 
 mongoose.connect(connection_url, {
   useNewUrlParser: true,
